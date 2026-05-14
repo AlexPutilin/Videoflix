@@ -1,0 +1,68 @@
+# =====================
+# Python
+# =====================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+.venv/
+.env/
+venv/
+ENV/
+env/
+
+# =====================
+# Environment variables
+# =====================
+.env
+.env.*
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Media & Static files (optional je nach Setup)
+media/
+staticfiles/
+
+# =====================
+# Runtime data / local DBs
+# =====================
+data/
+uploads/
+
+# =====================
+# OS
+# =====================
+.DS_Store
+.lnk
+Thumbs.db
+
+# =====================
+# Editor / IDE
+# =====================
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+
+# Migrations
+# migrations/
+# */migrations/
+# !*/migrations/__init__.py
+
+# Coverage / Tests
+.coverage
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+
+# Secrets / Keys
+*.pem
+*.key
+*.crt
