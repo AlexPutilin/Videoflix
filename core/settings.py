@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django_rq',
     'rest_framework',
     'rest_framework.authtoken',
+    'app_content.apps.ContentConfig',
 ]
 
 MIDDLEWARE = [
