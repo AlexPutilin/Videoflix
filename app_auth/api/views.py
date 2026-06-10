@@ -42,6 +42,7 @@ class ActivateAccountView(APIView):
 def get_user_from_uid(uidb64):
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
-        return User.objects.get(pk=uid)
+        user = User.objects.get(pk=uid)
+        return user
     except Exception:
         return None
