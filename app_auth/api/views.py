@@ -8,7 +8,7 @@ from app_auth.services.token_service import generate_activation_token
 from app_auth.services.mail_service import Mailservice
 
 
-class ReigsterView(APIView):
+class RegisterView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
