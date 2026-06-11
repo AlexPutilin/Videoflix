@@ -6,7 +6,8 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from .serializers import RegisterSerializer
+from .serializers import RegisterSerializer, LoginSerializer
+from app_auth.services.cookies_service import set_token_cookies, delete_token_cookies
 from app_auth.services.token_service import account_activation_token
 from app_auth.services.mail_service import Mailservice
 
@@ -34,6 +35,21 @@ class ActivateAccountView(APIView):
         user.is_active = True
         user.save(update_fields=["is_active"])
         return Response({"message": "Account successfully activated"}, status=status.HTTP_200_OK)
+
+
+class LoginView(TokenObtainPairView):
+    permission_classes = [AllowAny]
+    serializer_class = LoginSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        response = Response(status=status.HTTP_200_OK)
+        set_token_cookies(response, serializer.validated_data)
+        return response
+
+
+
 
 
 
