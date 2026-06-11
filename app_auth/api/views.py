@@ -3,11 +3,12 @@ from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
 from .serializers import RegisterSerializer, LoginSerializer
-from app_auth.services.cookies_service import set_token_cookies, set_access_cookie, delete_token_cookies
+from app_auth.services.cookies_service import Cookies
 from app_auth.services.token_service import account_activation_token
 from app_auth.services.mail_service import Mailservice
 
@@ -37,32 +38,45 @@ class ActivateAccountView(APIView):
         return Response({"message": "Account successfully activated"}, status=status.HTTP_200_OK)
 
 
-class LoginView(TokenObtainPairView):
+class LoginView(APIView):
     permission_classes = [AllowAny]
-    serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         response = Response(status=status.HTTP_200_OK)
-        set_token_cookies(response, serializer.validated_data)
+        Cookies.set_token_cookies(response, serializer.validated_data)
+        return response
+    
+
+class LogoutView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        refresh_token = request.COOKIES.get("refresh_token")
+        if not refresh_token:
+            return Response({"detail": "Refresh token is missing."}, status=status.HTTP_400_BAD_REQUEST)
+        response = Response({"detail": "Logout successful! All tokens will be deleted. Refresh token is now invalid."}, status=status.HTTP_200_OK)
+        Cookies.blacklist_refresh_token(refresh_token)
+        Cookies.delete_token_cookies(response)
         return response
 
 
-class RefreshTokenView(TokenRefreshView):
+class RefreshTokenView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
         refresh_token = request.COOKIES.get('refresh_token')
-        if refresh_token is None:
-            return Response({"detial": "Refresh token invalid or missing."}, status=status.HTTP_401_UNAUTHORIZED)
-        
-        serializer = self.get_serializer(data={'refresh': refresh_token})
-        serializer.is_valid(raise_exception=True)
-        response = Response({"detail": "Token refreshed", "access": serializer.validated_data["access"]}, status=status.HTTP_200_OK)
-        set_access_cookie(response, serializer.validated_data["access"])
+        if not refresh_token:
+            return Response({"detail": "Refresh token is missing."}, status=status.HTTP_400_BAD_REQUEST,)
+        try:
+            refresh = RefreshToken(refresh_token)
+            access_token = str(refresh.access_token)
+        except TokenError:
+            return Response({"detail": "Invalid refresh token."}, status=status.HTTP_401_UNAUTHORIZED)
+        response = Response({"detail": "Token refreshed", "access": access_token}, status=status.HTTP_200_OK)
+        Cookies.set_access_cookie(response, access_token)
         return response
-
 
 
 def get_user_from_uid(uidb64):
