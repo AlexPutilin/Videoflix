@@ -42,17 +42,17 @@ class RegisterSerializer(serializers.Serializer):
         return user
 
 
-class LoginSerializer(TokenObtainPairSerializer):
+class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        email = attrs.get("email")
+        email = attrs.get("email").lower().strip()
         password = attrs.get("password")
         user = authenticate(username=email, password=password)
         if user is None:
             raise serializers.ValidationError("Email or password is invalid.")
-        self.user = user
+        attrs["user"] = user
         refresh = RefreshToken.for_user(user)
         return {
             "refresh": str(refresh),
