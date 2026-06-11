@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django_rq',
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'app_auth.apps.AppAuthConfig',
     'app_video.apps.AppVideoConfig',
 ]
