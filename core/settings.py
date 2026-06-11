@@ -29,11 +29,14 @@ SECRET_KEY = os.getenv('SECRET_KEY', default='django-insecure-y!bq#-d(g+j52zt-t1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', default=True)
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default=[
-    'localhost',
-    '127.0.0.1'
-])
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='localhost').split(',')
 
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', default='http://localhost:5500').split(',')
+
+CORS_ALLOWED_ORIGINS = [
+    'http://127.0.0.1:5500',
+    'http://localhost:5500',
+]
 
 # Application definition
 
@@ -66,15 +69,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'core.urls'
 
-CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', default=[
-    'http://127.0.0.1:5500',
-    'http://localhost:5500',
-])
-
-CORS_ALLOWED_ORIGINS = [
-    'http://127.0.0.1:5500',
-    'http://localhost:5500',
-]
 
 TEMPLATES = [
     {
