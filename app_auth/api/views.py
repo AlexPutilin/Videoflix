@@ -7,7 +7,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .serializers import RegisterSerializer, LoginSerializer
-from app_auth.services.cookies_service import set_token_cookies, delete_token_cookies
+from app_auth.services.cookies_service import set_token_cookies, set_access_cookie, delete_token_cookies
 from app_auth.services.token_service import account_activation_token
 from app_auth.services.mail_service import Mailservice
 
@@ -49,9 +49,19 @@ class LoginView(TokenObtainPairView):
         return response
 
 
+class RefreshTokenView(TokenRefreshView):
+    permission_classes = [AllowAny]
 
-
-
+    def post(self, request, *args, **kwargs):
+        refresh_token = request.COOKIES.get('refresh_token')
+        if refresh_token is None:
+            return Response({"detial": "Refresh token invalid or missing."}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        serializer = self.get_serializer(data={'refresh': refresh_token})
+        serializer.is_valid(raise_exception=True)
+        response = Response({"detail": "Token refreshed", "access": serializer.validated_data["access"]}, status=status.HTTP_200_OK)
+        set_access_cookie(response, serializer.validated_data["access"])
+        return response
 
 
 
