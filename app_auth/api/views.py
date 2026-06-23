@@ -10,7 +10,7 @@ from rest_framework_simplejwt.exceptions import TokenError
 from .serializers import RegisterSerializer, LoginSerializer
 from app_auth.services.cookies_service import Cookies
 from app_auth.services.token_service import account_activation_token
-from app_auth.services.mail_service import Mailservice
+from app_auth.services.mail_service import send_activation_email, send_password_reset_email
 
 
 class RegisterView(APIView):
@@ -21,7 +21,7 @@ class RegisterView(APIView):
         if serializer.is_valid():
             user = serializer.save()
             token = account_activation_token.make_token(user)
-            Mailservice.send_activation_email(user, token)
+            send_activation_email(user, token)
             return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
