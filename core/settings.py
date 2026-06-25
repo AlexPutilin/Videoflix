@@ -16,6 +16,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+def get_bool_env(name, default=False):
+    value = os.getenv(name)
+
+    if value is None:
+        return default
+
+    return value.lower() in ["true", "1", "yes", "on"]
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -190,14 +198,14 @@ SIMPLE_JWT = {
 
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST = os.getenv('EMAIL_HOST')
-EMAIL_PORT = os.getenv('EMAIL_PORT', default=587)
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', default=587))
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', default=True)
-EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', default=False)
+EMAIL_USE_TLS = get_bool_env('EMAIL_USE_TLS', default=True)
+EMAIL_USE_SSL = get_bool_env('EMAIL_USE_SSL', default=False)
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', default=EMAIL_HOST_USER)
 
 
 # FRONTEND
 
-FRONTEND_URL = os.getenv('FRONTEND_URL', default='127.0.0.1:5500')
+FRONTEND_URL = os.getenv('FRONTEND_URL', default='http://127.0.0.1:5500')
