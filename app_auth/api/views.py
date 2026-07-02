@@ -90,7 +90,7 @@ class PasswordResetView(APIView):
         if user:
             token = default_token_generator.make_token(user)
             send_password_reset_email(user, token)
-        return Response({"detail": "An email has been sent to reset your password."}, status=status.HTTP_200_OK))
+        return Response({"detail": "An email has been sent to reset your password."}, status=status.HTTP_200_OK)
 
 
 class PasswordConfirmView(APIView):
