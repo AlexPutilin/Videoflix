@@ -23,8 +23,7 @@ def send_activation_email(user, token):
     )
 
 
-def send_password_reset_email(user):
-    token = default_token_generator.make_token(user)
+def send_password_reset_email(user, token):
     uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
     reset_url = f"{settings.FRONTEND_URL}/pages/auth/confirm_password.html?uid={uidb64}&token={token}"
     context = {
